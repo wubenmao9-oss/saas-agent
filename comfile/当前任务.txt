@@ -1,0 +1,31 @@
+Phase 2: 数据持久层映射 (Entity 与 Mapper 设计)
+当前阶段的核心目标是将底层数据库结构与 Java 运行环境打通。由于系统后续需要承接大模型 Agent 的高频查询与事务调用，持久层的字段映射和 SQL 编写必须严谨。
+
+你需要完成以下两项开发任务：
+
+任务一：建立 Java 实体类 (Entity / POJO)
+根据 Phase 1 确定的三张表（account_info, api_license, api_usage_log），创建对应的 Java 实体类。
+
+关键约束：
+
+MySQL 中的下划线命名法（如 account_id）需要映射为 Java 的小驼峰命名（如 accountId）。
+
+注意数据类型转换：MySQL 的 int 对应 Java 的 Integer，varchar 对应 String，datetime/timestamp 建议使用 Java 8 的 LocalDateTime 或 Date。
+
+针对 account_info 表的 create_time 字段，需在实体类或插入逻辑中体现初始赋值机制（应对 Phase 1 中 MySQL 5.5 的版本限制）。
+
+任务二：定义 MyBatis Mapper 接口与 SQL 查询
+大模型的 Tool Calling 最终会落地为具体的数据库操作。你需要为上述实体类编写对应的 Mapper 接口，并使用 XML 或注解方式实现以下三个核心 SQL 逻辑：
+
+资源状态探针查询： 根据传入的 account_id，查询该账户的 status，以及其对应的 api_license 表中的 plan_type、total_quota 和 used_quota。
+
+异常流水检索： 根据传入的 account_id 和一个起始时间（如最近3天），查询 api_usage_log 表中 http_status 不等于 200 的所有错误记录。
+
+补偿与日志记录（并发执行）：
+
+根据 account_id，对 api_license 表的 total_quota 字段执行累加操作（增加补偿额度）。
+
+向 api_usage_log 插入一条记录以留存补偿痕迹（http_status 可设为特定标识如 201，记录补偿原因）。
+
+本次提交要求：
+为了验证映射规范，请先不要提交所有代码。请仅提交 api_usage_log 对应的实体类代码，以及上述第2点（异常流水检索）的 Mapper 接口和对应的 SQL 实现。

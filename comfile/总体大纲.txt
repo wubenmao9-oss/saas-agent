@@ -1,0 +1,9 @@
+Phase 1: 数据底座构建 (MySQL 物理表结构设计与约束定义)
+
+Phase 2: 数据持久层映射 (Spring Boot 整合 MyBatis，编写实体类与基础 CRUD SQL 标签)
+
+Phase 3: 核心事务流转 (Service 层编写，实现资源状态探查与补偿事务闭环)
+
+Phase 4: Agent 中枢接入 (引入 LangChain4j，定义 @Tool 接口并关联 Service)
+
+Phase 5: 边界异常与系统防线 (处理大模型幻觉参数、防重复提交校验、流式输出测试)
